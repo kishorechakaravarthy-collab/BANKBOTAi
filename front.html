@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BANKBOT AI — Innorve Xypheria</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0a0f0d;
+  --bg-primary: #0f1613;
+  --bg-card: #151e1a;
+  --bg-card-hover: #1a2722;
+  --bg-elevated: #1e2b25;
+  --border: #243029;
+  --border-light: #2d3d34;
+  --text-primary: #e8f0ec;
+  --text-secondary: #9aada2;
+  --text-muted: #5e7568;
+  --accent: #00d4aa;
+  --accent-dim: #00a884;
+  --accent-glow: rgba(0,212,170,0.15);
+  --accent-glow-strong: rgba(0,212,170,0.3);
+  --gold: #f0b429;
+  --gold-dim: rgba(240,180,41,0.15);
+  --red: #ef4444;
+  --red-dim: rgba(239,68,68,0.12);
+  --orange: #f97316;
+  --orange-dim: rgba(249,115,22,0.12);
+  --green: #22c55e;
+  --green-dim: rgba(34,197,94,0.12);
+  --blue: #38bdf8;
+  --blue-dim: rgba(56,189,248,0.12);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1,h2,h3,h4,h5,h6 { font-family: 'Space Grotesk', sans-serif; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+/* Background atmosphere */
+.bg-atmosphere {
+  position: fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 800px 600px at 20% 10%, rgba(0,212,170,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 600px 500px at 80% 80%, rgba(0,168,132,0.03) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 400px at 50% 50%, rgba(240,180,41,0.02) 0%, transparent 70%);
+}
+
+/* Top navigation */
+.top-nav {
+  position: fixed; top:0; left:0; right:0; z-index:100;
+  background: rgba(15,22,19,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  height: 64px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+}
+
+.nav-brand {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.nav-logo {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-dim));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; color: var(--bg-deep); font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.nav-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18px; font-weight: 600; color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+.nav-title span { color: var(--accent); }
+
+.nav-subtitle {
+  font-size: 11px; color: var(--text-muted); letter-spacing: 1.5px;
+  text-transform: uppercase; margin-top: 1px;
+}
+
+.nav-tabs {
+  display: flex; gap: 4px;
+  background: var(--bg-card);
+  border-radius: 10px; padding: 4px;
+  border: 1px solid var(--border);
+}
+
+.nav-tab {
+  padding: 8px 20px; border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer; border: none; background: none;
+  transition: all 0.25s ease;
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.nav-tab:hover { color: var(--text-primary); }
+
+.nav-tab.active {
+  background: var(--accent);
+  color: var(--bg-deep);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.nav-tab i { font-size: 13px; }
+
+.nav-status {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--text-muted);
+}
+
+.status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px rgba(34,197,94,0.5);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.85); }
+}
+
+/* Main content area */
+.main-content {
+  position: relative; z-index: 1;
+  padding-top: 64px;
+  height: 100vh;
+}
+
+/* ===== MEMBER INTERFACE ===== */
+.member-view {
+  display: flex; height: calc(100vh - 64px);
+  opacity: 1; transition: opacity 0.3s ease;
+}
+
+.member-view.hidden { display: none; }
+
+/* Member sidebar */
+.member-sidebar {
+  width: 300px; border-right: 1px solid var(--border);
+  background: var(--bg-primary);
+  display: flex; flex-direction: column;
+  flex-shrink: 0;
+}
+
+.member-info {
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.member-avatar {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent-glow-strong), var(--accent-dim));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; color: var(--accent);
+  font-family: 'Space Grotesk', sans-serif;
+  margin-bottom: 14px;
+}
+
+.member-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px; font-weight: 600; margin-bottom: 4px;
+}
+
+.member-id { font-size: 12px; color: var(--text-muted); }
+
+.member-quick-actions {
+  padding: 16px; flex: 1; overflow-y: auto;
+}
+
+.quick-actions-title {
+  font-size: 11px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1.2px;
+  margin-bottom: 12px; padding: 0 8px;
+}
+
+.quick-action-btn {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  cursor: pointer; font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.quick-action-btn:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-light);
+  color: var(--text-primary);
+  transform: translateX(2px);
+}
+
+.quick-action-btn i {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 8px; font-size: 13px; flex-shrink: 0;
+}
+
+.qa-balance i { background: var(--accent-glow); color: var(--accent); }
+.qa-dispute i { background: var(--red-dim); color: var(--red); }
+.qa-loan i { background: var(--blue-dim); color: var(--blue); }
+.qa-card i { background: var(--orange-dim); color: var(--orange); }
+.qa-address i { background: var(--gold-dim); color: var(--gold); }
+.qa-policy i { background: var(--green-dim); color: var(--green); }
+
+/* Chat area */
+.chat-area {
+  flex: 1; display: flex; flex-direction: column;
+  background: var(--bg-deep);
+  position: relative;
+}
+
+.chat-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(15,22,19,0.6);
+  backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.chat-header-left {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.chat-header-icon {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--accent-glow);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent); font-size: 15px;
+}
+
+.chat-header-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; font-weight: 600;
+}
+
+.chat-header-sub {
+  font-size: 11px; color: var(--text-muted);
+}
+
+.voice-btn {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  color: var(--text-secondary); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; transition: all 0.2s ease;
+}
+
+.voice-btn:hover { border-color: var(--accent); color: var(--accent); }
+.voice-btn.recording { background: var(--red-dim); border-color: var(--red); color: var(--red); animation: pulse-rec 1s ease-in-out infinite; }
+
+@keyframes pulse-rec {
+  0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
+  50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+}
+
+/* Messages */
+.chat-messages {
+  flex: 1; overflow-y: auto;
+  padding: 24px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+.message {
+  display: flex; gap: 12px; max-width: 75%;
+  animation: msgIn 0.35s ease-out;
+}
+
+@keyframes msgIn {
+  from { opacity:0; transform: translateY(12px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+.message.member { align-self: flex-end; flex-direction: row-reverse; }
+
+.msg-avatar {
+  width: 32px; height: 32px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; flex-shrink: 0; margin-top: 2px;
+}
+
+.message.ai .msg-avatar {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+.message.member .msg-avatar {
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+}
+
+.msg-bubble {
+  padding: 14px 18px;
+  border-radius: 16px;
+  font-size: 14px; line-height: 1.6;
+}
+
+.message.ai .msg-bubble {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top-left-radius: 4px;
+  color: var(--text-primary);
+}
+
+.message.member .msg-bubble {
+  background: linear-gradient(135deg, var(--accent-dim), var(--accent));
+  border-top-right-radius: 4px;
+  color: var(--bg-deep);
+  font-weight: 500;
+}
+
+.msg-bubble .source-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-top: 10px; padding: 4px 10px;
+  background: var(--accent-glow);
+  border-radius: 6px;
+  font-size: 11px; color: var(--accent);
+}
+
+.msg-bubble .escalation-tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-top: 10px; padding: 4px 10px;
+  background: var(--orange-dim);
+  border-radius: 6px;
+  font-size: 11px; color: var(--orange);
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: none; gap: 12px; max-width: 75%;
+  animation: msgIn 0.3s ease-out;
+}
+
+.typing-indicator.show { display: flex; }
+
+.typing-dots {
+  padding: 16px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px; border-top-left-radius: 4px;
+  display: flex; gap: 5px; align-items: center;
+}
+
+.typing-dots span {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--text-muted);
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+
+.typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Chat input */
+.chat-input-area {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  background: rgba(15,22,19,0.6);
+  backdrop-filter: blur(10px);
+}
+
+.chat-input-wrapper {
+  display: flex; gap: 10px; align-items: flex-end;
+}
+
+.chat-input {
+  flex: 1; padding: 14px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  resize: none; outline: none;
+  min-height: 48px; max-height: 120px;
+  transition: border-color 0.2s ease;
+  line-height: 1.5;
+}
+
+.chat-input::placeholder { color: var(--text-muted); }
+.chat-input:focus { border-color: var(--accent); }
+
+.send-btn {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: var(--accent);
+  border: none; cursor: pointer;
+  color: var(--bg-deep); font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.send-btn:hover { background: var(--accent-dim); transform: scale(1.05); }
+.send-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+.chat-input-hint {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 8px; padding-left: 4px;
+}
+
+/* ===== STAFF DASHBOARD ===== */
+.staff-view {
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  opacity: 1; transition: opacity 0.3s ease;
+}
+
+.staff-view.hidden { display: none; }
+
+.staff-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+/* Stats cards */
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.stat-card:hover {
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute; top:0; left:0; right:0; height: 3px;
+}
+
+.stat-card.sc-total::before { background: var(--accent); }
+.stat-card.sc-resolved::before { background: var(--green); }
+.stat-card.sc-pending::before { background: var(--orange); }
+.stat-card.sc-escalated::before { background: var(--red); }
+
+.stat-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; margin-bottom: 14px;
+}
+
+.sc-total .stat-icon { background: var(--accent-glow); color: var(--accent); }
+.sc-resolved .stat-icon { background: var(--green-dim); color: var(--green); }
+.sc-pending .stat-icon { background: var(--orange-dim); color: var(--orange); }
+.sc-escalated .stat-icon { background: var(--red-dim); color: var(--red); }
+
+.stat-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 32px; font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 13px; color: var(--text-secondary);
+}
+
+.stat-change {
+  font-size: 11px; margin-top: 8px;
+  display: flex; align-items: center; gap: 4px;
+}
+
+.stat-change.up { color: var(--green); }
+.stat-change.down { color: var(--red); }
+
+/* Dashboard main layout */
+.dashboard-body {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 16px;
+  padding: 0 24px 24px;
+  min-height: 0;
+}
+
+/* Cases panel */
+.cases-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  display: flex; flex-direction: column;
+  max-height: calc(100vh - 280px);
+}
+
+.cases-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.cases-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; font-weight: 600;
+}
+
+.cases-filters {
+  display: flex; gap: 4px;
+}
+
+.filter-btn {
+  padding: 6px 14px; border-radius: 8px;
+  font-size: 12px; font-weight: 500;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover { color: var(--text-primary); border-color: var(--border-light); }
+.filter-btn.active { background: var(--accent); color: var(--bg-deep); border-color: var(--accent); }
+
+.cases-list {
+  flex: 1; overflow-y: auto; padding: 8px;
+}
+
+.case-item {
+  padding: 14px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+}
+
+.case-item:hover { background: var(--bg-card-hover); border-color: var(--border); }
+.case-item.selected { background: var(--accent-glow); border-color: var(--accent); }
+
+.case-item-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.case-member {
+  font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.case-member-avatar {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: var(--bg-elevated);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; color: var(--text-muted);
+}
+
+.case-badge {
+  padding: 3px 10px; border-radius: 6px;
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+.case-badge.resolved { background: var(--green-dim); color: var(--green); }
+.case-badge.escalated { background: var(--red-dim); color: var(--red); }
+.case-badge.pending { background: var(--orange-dim); color: var(--orange); }
+.case-badge.priority { background: rgba(239,68,68,0.2); color: #f87171; }
+
+.case-preview {
+  font-size: 12px; color: var(--text-secondary);
+  line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.case-meta {
+  display: flex; gap: 12px; margin-top: 8px;
+  font-size: 11px; color: var(--text-muted);
+}
+
+.case-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* Detail panel */
+.detail-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  display: flex; flex-direction: column;
+  max-height: calc(100vh - 280px);
+}
+
+.detail-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+
+.detail-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 15px; font-weight: 600;
+}
+
+.detail-actions { display: flex; gap: 8px; }
+
+.detail-action-btn {
+  padding: 7px 14px; border-radius: 8px;
+  font-size: 12px; font-weight: 500;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer; font-family: 'DM Sans', sans-serif;
+  transition: all 0.2s ease;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.detail-action-btn:hover { color: var(--text-primary); border-color: var(--border-light); }
+.detail-action-btn.resolve-btn:hover { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+
+.detail-content {
+  flex: 1; overflow-y: auto; padding: 20px;
+}
+
+.detail-empty {
+  height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--text-muted); text-align: center;
+}
+
+.detail-empty i { font-size: 40px; margin-bottom: 16px; opacity: 0.3; }
+.detail-empty p { font-size: 13px; }
+
+/* Detail sections */
+.detail-section {
+  margin-bottom: 20px;
+}
+
+.detail-section-title {
+  font-size: 11px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 1.2px;
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.detail-info-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+
+.detail-info-item {
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+}
+
+.detail-info-label { font-size: 11px; color: var(--text-muted); margin-bottom: 3px; }
+.detail-info-value { font-size: 13px; font-weight: 500; }
+
+.sentiment-indicator {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg-elevated);
+  border-radius: 8px;
+}
+
+.sentiment-bar {
+  flex: 1; height: 6px; background: var(--border);
+  border-radius: 3px; overflow: hidden;
+}
+
+.sentiment-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.sentiment-label { font-size: 12px; font-weight: 500; }
+
+/* Conversation in detail */
+.detail-conversation {
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.detail-msg {
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px; line-height: 1.5;
+}
+
+.detail-msg.member-msg {
+  background: var(--accent-glow);
+  border: 1px solid rgba(0,212,170,0.2);
+  margin-left: 32px;
+}
+
+.detail-msg.ai-msg {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  margin-right: 32px;
+}
+
+.detail-msg-role {
+  font-size: 10px; color: var(--text-muted);
+  text-transform: uppercase; letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+/* Escalation summary box */
+.escalation-summary {
+  background: var(--orange-dim);
+  border: 1px solid rgba(249,115,22,0.3);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.escalation-summary h4 {
+  font-size: 12px; color: var(--orange); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+.escalation-summary ul {
+  list-style: none; padding: 0;
+}
+
+.escalation-summary li {
+  font-size: 12px; color: var(--text-secondary);
+  padding: 3px 0; padding-left: 16px;
+  position: relative;
+}
+
+.escalation-summary li::before {
+  content: '';
+  position: absolute; left: 0; top: 10px;
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--orange);
+}
+
+/* Analytics row */
+.analytics-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 0 24px 24px;
+}
+
+.analytics-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.analytics-card-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px; font-weight: 600;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.analytics-card-title i { color: var(--accent); font-size: 14px; }
+
+/* Bar chart */
+.bar-chart {
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.bar-row {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.bar-label {
+  font-size: 12px; color: var(--text-secondary);
+  width: 120px; flex-shrink: 0;
+  white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bar-track {
+  flex: 1; height: 24px;
+  background: var(--bg-elevated);
+  border-radius: 6px; overflow: hidden;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%; border-radius: 6px;
+  transition: width 0.8s ease;
+  display: flex; align-items: center;
+  padding: 0 8px;
+}
+
+.bar-value {
+  font-size: 11px; font-weight: 600;
+  color: var(--bg-deep);
+  white-space: nowrap;
+}
+
+/* Metrics grid */
+.metrics-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+
+.metric-item {
+  padding: 14px;
+  background: var(--bg-elevated);
+  border-radius: 10px;
+}
+
+.metric-value {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px; font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.metric-label {
+  font-size: 11px; color: var(--text-muted);
+}
+
+/* Toast notification */
+.toast-container {
+  position: fixed; top: 80px; right: 24px;
+  z-index: 200; display: flex; flex-direction: column; gap: 8px;
+}
+
+.toast {
+  padding: 12px 20px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  display: flex; align-items: center; gap: 10px;
+  animation: toastIn 0.35s ease-out;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  max-width: 340px;
+}
+
+.toast.success { border-left: 3px solid var(--green); }
+.toast.warning { border-left: 3px solid var(--orange); }
+.toast.info { border-left: 3px solid var(--accent); }
+
+.toast.hiding { animation: toastOut 0.3s ease-in forwards; }
+
+@keyframes toastIn {
+  from { opacity:0; transform: translateX(40px); }
+  to { opacity:1; transform: translateX(0); }
+}
+
+@keyframes toastOut {
+  from { opacity:1; transform: translateX(0); }
+  to { opacity:0; transform: translateX(40px); }
+}
+
+/* RAG indicator */
+.rag-indicator {
+  display: none;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  z-index: 10;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.rag-indicator.show { display: block; animation: ragFade 0.3s ease; }
+
+@keyframes ragFade {
+  from { opacity:0; transform: translate(-50%,-50%) scale(0.95); }
+  to { opacity:1; transform: translate(-50%,-50%) scale(1); }
+}
+
+.rag-steps {
+  display: flex; flex-direction: column; gap: 8px;
+  margin-top: 16px; text-align: left;
+}
+
+.rag-step {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; color: var(--text-muted);
+  transition: all 0.3s ease;
+}
+
+.rag-step.active { color: var(--accent); }
+.rag-step.done { color: var(--green); }
+
+.rag-step i { width: 16px; text-align: center; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .member-sidebar { display: none; }
+  .staff-grid { grid-template-columns: 1fr 1fr; }
+  .dashboard-body { grid-template-columns: 1fr; }
+  .detail-panel { max-height: 500px; }
+}
+
+@media (max-width: 640px) {
+  .staff-grid { grid-template-columns: 1fr; }
+  .analytics-row { grid-template-columns: 1fr; }
+  .nav-subtitle { display: none; }
+  .message { max-width: 90%; }
+  .nav-status { display: none; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-atmosphere"></div>
+
+<!-- Top Navigation -->
+<nav class="top-nav">
+  <div class="nav-brand">
+    <div class="nav-logo">BB</div>
+    <div>
+      <div class="nav-title">BANK<span>BOT</span> AI</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-view="member" aria-label="Member Interface">
+      <i class="fas fa-comments"></i> Member Interface
+    </button>
+    <button class="nav-tab" data-view="staff" aria-label="Staff Dashboard">
+      <i class="fas fa-chart-line"></i> Staff Dashboard
+    </button>
+  </div>
+  <div class="nav-status">
+    <div class="status-dot"></div>
+    <span>AI Engine Active</span>
+  </div>
+</nav>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Main Content -->
+<main class="main-content">
+
+  <!-- MEMBER INTERFACE -->
+  <div class="member-view" id="memberView">
+    <!-- Sidebar -->
+    <aside class="member-sidebar">
+      <div class="member-info">
+        <div class="member-avatar">SP</div>
+        <div class="member-name">Sarah Palmer</div>
+        <div class="member-id">Member #CU-2024-08472</div>
+      </div>
+      <div class="member-quick-actions">
+        <div class="quick-actions-title">Quick Actions</div>
+        <button class="quick-action-btn qa-balance" onclick="sendQuickAction('What is my current account balance?')">
+          <i class="fas fa-wallet"></i>
+          <span>Check Balance</span>
+        </button>
+        <button class="quick-action-btn qa-dispute" onclick="sendQuickAction('I see a charge I don\'t recognize on my account. I didn\'t make this purchase.')">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span>Report Dispute</span>
+        </button>
+        <button class="quick-action-btn qa-loan" onclick="sendQuickAction('I applied for a personal loan 5 days ago and haven\'t heard back. What\'s my status?')">
+          <i class="fas fa-file-invoice-dollar"></i>
+          <span>Loan Status</span>
+        </button>
+        <button class="quick-action-btn qa-card" onclick="sendQuickAction('My debit card got blocked after 3 failed PINs. How do I get it reactivated?')">
+          <i class="fas fa-credit-card"></i>
+          <span>Card Block / Unblock</span>
+        </button>
+        <button class="quick-action-btn qa-address" onclick="sendQuickAction('I recently moved and need to update my registered address. What do I need to submit?')">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>Update Address</span>
+        </button>
+        <button class="quick-action-btn qa-policy" onclick="sendQuickAction('What\'s the penalty if I close my fixed deposit before the maturity date?')">
+          <i class="fas fa-gavel"></i>
+          <span>Policy Question</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Chat Area -->
+    <section class="chat-area">
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <div class="chat-header-icon"><i class="fas fa-robot"></i></div>
+          <div>
+            <div class="chat-header-title">BANKBOT AI</div>
+            <div class="chat-header-sub">Powered by RAG Resolution Engine</div>
+          </div>
+        </div>
+        <button class="voice-btn" id="voiceBtn" aria-label="Voice input" title="Voice Input">
+          <i class="fas fa-microphone"></i>
+        </button>
+      </div>
+
+      <div class="chat-messages" id="chatMessages">
+        <!-- Welcome message injected by JS -->
+      </div>
+
+      <div class="typing-indicator" id="typingIndicator">
+        <div class="msg-avatar" style="background:var(--accent-glow);color:var(--accent);"><i class="fas fa-robot" style="font-size:12px;"></i></div>
+        <div class="typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="chat-input-area">
+        <div class="chat-input-wrapper">
+          <textarea class="chat-input" id="chatInput" placeholder="Describe your issue in plain language..." rows="1" aria-label="Type your message"></textarea>
+          <button class="send-btn" id="sendBtn" aria-label="Send message">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+        <div class="chat-input-hint">
+          <i class="fas fa-shield-alt" style="margin-right:4px;"></i>
+          Responses are grounded in credit union knowledge base — not general AI knowledge
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- STAFF DASHBOARD -->
+  <div class="staff-view hidden" id="staffView">
+    <!-- Stats Row -->
+    <div class="staff-grid" id="statsGrid">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- Main Dashboard Body -->
+    <div class="dashboard-body">
+      <!-- Cases List -->
+      <div class="cases-panel">
+        <div class="cases-header">
+          <div class="cases-title"><i class="fas fa-inbox" style="margin-right:8px;color:var(--accent);"></i>Case Queue</div>
+          <div class="cases-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="escalated">Escalated</button>
+            <button class="filter-btn" data-filter="resolved">Resolved</button>
+            <button class="filter-btn" data-filter="pending">Pending</button>
+          </div>
+        </div>
+        <div class="cases-list" id="casesList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Detail Panel -->
+      <div class="detail-panel">
+        <div class="detail-header">
+          <div class="detail-title">Case Details</div>
+          <div class="detail-actions" id="detailActions" style="display:none;">
+            <button class="detail-action-btn resolve-btn" onclick="resolveSelectedCase()">
+              <i class="fas fa-check"></i> Resolve
+            </button>
+            <button class="detail-action-btn" onclick="closeDetail()">
+              <i class="fas fa-times"></i> Close
+            </button>
+          </div>
+        </div>
+        <div class="detail-content" id="detailContent">
+          <div class="detail-empty">
+            <i class="fas fa-hand-pointer"></i>
+            <p>Select a case from the queue<br>to view full details</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Row -->
+    <div class="analytics-row" id="analyticsRow">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ============================================================
+// CREDIT UNION KNOWLEDGE BASE (12 Documents - RAG Source)
+// ============================================================
+const knowledgeBase = [
+  {
+    id: "KB001",
+    title: "Account Balance Inquiry Policy",
+    category: "Account Management",
+    content: "Members can check their account balance through multiple channels: the BANKBOT chat, the member mobile app, ATM, or by calling member support. Real-time balance is available 24/7. For joint accounts, all account holders can view the balance. Pending transactions may not reflect immediately — allow up to 24 hours for merchant transactions to settle. Available balance differs from current balance when holds are placed on deposits per Regulation CC.",
+    keywords: ["balance", "account", "check", "available", "current", "pending", "hold"]
+  },
+  {
+    id: "KB002",
+    title: "Transaction Dispute Filing Procedure",
+    category: "Disputes",
+    content: "To dispute a transaction: (1) Report within 60 days of the statement date per Regulation E. (2) Provide the transaction date, amount, merchant name, and reason for dispute. (3) A provisional credit of the disputed amount will be applied to your account within 10 business days. (4) Investigation takes up to 45 calendar days (90 days for certain transactions). (5) You will be notified of the final determination via secure message. Required documentation: transaction receipt if available, any correspondence with the merchant, and a completed Dispute Form (DF-101). No fee is charged for filing a dispute.",
+    keywords: ["dispute", "charge", "unrecognized", "unauthorized", "fraud", "provisional", "investigation", "refund"]
+  },
+  {
+    id: "KB003",
+    title: "Personal Loan Application & Status",
+    category: "Loans",
+    content: "Personal loan processing timeline: Application review takes 2-3 business days. Credit decision within 5 business days from complete application submission. If additional documents are needed, the applicant is notified via email and secure message — processing pauses until documents are received. Loan status can be checked through BANKBOT AI by providing the application reference number. Approved loans are disbursed within 2 business days after signing the loan agreement. Current personal loan interest rates: 8.99% APR (excellent credit, 750+), 11.49% APR (good credit, 700-749), 14.99% APR (fair credit, 650-699). Loan amounts range from $1,000 to $50,000 with terms of 12 to 60 months.",
+    keywords: ["loan", "personal loan", "status", "application", "approved", "pending", "disbursed", "interest rate", "APR"]
+  },
+  {
+    id: "KB004",
+    title: "Debit Card Block & Unblock Procedure",
+    category: "Cards",
+    content: "Debit cards are automatically blocked after 3 consecutive failed PIN attempts for security. To unblock: Option A — Visit any branch with a valid government-issued photo ID. The card can be unblocked immediately at the teller counter. Option B — Use the mobile app to perform a self-service PIN reset if your phone number is verified (requires OTP verification). Option C — Call member support at 1-800-CU-HELP and verify your identity with security questions. Temporary block (lost/stolen): Immediately call 1-800-CU-HELP or use the mobile app's 'Lock Card' feature. A replacement card will be issued within 5-7 business days. Emergency replacement available at branches within 1 business day for a $15 expedite fee.",
+    keywords: ["card", "blocked", "unblock", "PIN", "debit", "reactivate", "lost", "stolen", "replacement"]
+  },
+  {
+    id: "KB005",
+    title: "Address Update Requirements",
+    category: "Account Management",
+    content: "To update your registered address: (1) Submit a completed Address Change Form (AC-201) available at any branch or on the member portal. (2) Provide one proof of new address: utility bill (gas, electric, water) dated within last 30 days, lease agreement, or government-issued mail. (3) For name+address changes simultaneously, a government-issued photo ID with the new address is required. Processing time: 2-3 business days after receipt of all documents. Online update is available through the member portal if you have verified identity with 2-factor authentication — no physical documents needed for portal updates. Address update does not affect your account number or debit card.",
+    keywords: ["address", "update", "move", "relocate", "proof", "utility", "change", "registered"]
+  },
+  {
+    id: "KB006",
+    title: "Fixed Deposit Premature Closure Penalty",
+    category: "Deposits",
+    content: "Premature closure of fixed deposits: If closed before completion of 6 months from deposit date — no interest will be paid; only the principal amount is returned. If closed after 6 months but before maturity — interest is paid at the rate applicable for the period the deposit was held, minus a 1% penalty on the applicable rate. Example: A 1-year FD at 5.5% APR closed after 9 months — interest will be calculated at the 9-month FD rate (say 4.8%) minus 1% penalty = 3.8% APR applied pro-rata. No penalty is charged for FDs closed due to the member's death (nominee can close without penalty). Partial premature withdrawal is available for FDs above $10,000 — up to 25% of the principal once per financial year.",
+    keywords: ["fixed deposit", "FD", "premature", "close", "penalty", "maturity", "interest", "withdrawal"]
+  },
+  {
+    id: "KB007",
+    title: "Credit Card Interest Rates & Fees",
+    category: "Cards",
+    content: "Credit union credit card rates: Platinum Card — 14.99% APR on purchases, 24.99% APR on cash advances. Gold Card — 11.99% APR on purchases, 22.99% APR on cash advances. Secured Card — 18.99% APR on purchases (no cash advance). Annual fee: Platinum $0, Gold $0, Secured $25. Late payment fee: $29 for balances under $1,000, $39 for balances $1,000+. Grace period: 25 days from statement date if previous balance is paid in full. Minimum payment: Greater of $25 or 2% of outstanding balance. Foreign transaction fee: 1% on all international purchases. Cash advance fee: $10 or 3% of advance amount, whichever is greater.",
+    keywords: ["credit card", "interest", "APR", "fee", "annual", "late", "payment", "cash advance", "grace"]
+  },
+  {
+    id: "KB008",
+    title: "Mobile & Online Banking Troubleshooting",
+    category: "Digital Banking",
+    content: "Common issues and resolutions: (1) Cannot log in — Reset password via 'Forgot Password' link. After 5 failed login attempts, account is locked for 30 minutes. (2) App not loading — Ensure app is updated to latest version. Clear app cache. Check if your device OS is supported (iOS 14+ or Android 10+). (3) OTP not received — Check spam folder. Ensure registered mobile number is correct. Request OTP resend after 60 seconds. (4) Biometric login not working — Re-enable biometrics in app Settings > Security. (5) Transaction failed but amount debited — Amount auto-reverses within 5-7 business days if the transaction did not complete. File a dispute if not reversed after 7 days. For persistent issues, contact tech support at techsupport@crestviewcu.org.",
+    keywords: ["app", "mobile", "online", "login", "password", "OTP", "biometric", "troubleshoot", "banking"]
+  },
+  {
+    id: "KB009",
+    title: "Overdraft Protection & Fees",
+    category: "Account Management",
+    content: "Overdraft protection options: (1) Savings transfer — Automatically transfers from savings to checking to cover overdrafts. Transfer increment: $100. Fee: $0 per transfer. (2) Overdraft line of credit — Approved credit line (up to $1,000) that covers overdrafts. APR: 18.00%. No per-transaction fee. (3) Standard overdraft — Transactions may be paid into overdraft at the credit union's discretion. Fee: $28 per item (maximum 4 per day = $112). If you do not opt in to standard overdraft, debit card transactions that would overdraw your account will be declined at no charge. Overdraft protection enrollment can be done at any branch, via member portal, or by calling member support.",
+    keywords: ["overdraft", "overdrawn", "bounce", "NSF", "fee", "protection", "savings", "line of credit"]
+  },
+  {
+    id: "KB010",
+    title: "Wire Transfer & ACH Procedures",
+    category: "Transfers",
+    content: "Domestic wire transfer: Processed same business day if submitted before 3:00 PM ET. Fee: $20 for outgoing, $0 for incoming. Required: Recipient name, account number, routing number, and bank name. International wire: Processed within 1-2 business days. Fee: $45 for outgoing. Additional info required: SWIFT code, recipient bank address, and IBAN (for countries that use IBAN). ACH transfers: Free for all members. Standard ACH takes 2-3 business days. ACH debit blocks can be placed on your account to prevent unauthorized ACH debits — submit form ACH-BLOCK at any branch. Direct deposit setup: Provide your employer with the credit union's routing number 021000021 and your account number.",
+    keywords: ["wire", "transfer", "ACH", "domestic", "international", "SWIFT", "routing", "direct deposit"]
+  },
+  {
+    id: "KB011",
+    title: "Account Closure Procedure",
+    category: "Account Management",
+    content: "To close an account: (1) Ensure all pending transactions have cleared (wait 5-7 business days after last transaction). (2) Withdraw remaining balance or request a cashier's check. (3) Close any linked services: direct deposits, automatic payments, overdraft protection. (4) Visit a branch with a valid photo ID, or submit a written request via secure message. (5) Destroy all debit cards and checks associated with the account. Processing time: Account is closed within 1-2 business days. If there is a negative balance at the time of closure, you are still responsible for the amount owed. Dormant accounts (no activity for 12 months) are subject to a $5/month inactivity fee. Accounts dormant for 3 years may be escheated to the state per unclaimed property laws.",
+    keywords: ["close", "closure", "account", "dormant", "inactivity", "escheat", "cancel"]
+  },
+  {
+    id: "KB012",
+    title: "Loan EMI Payment & Default Policy",
+    category: "Loans",
+    content: "EMI payment due date is fixed as per the loan agreement (typically the 1st or 15th of each month). Grace period: 10 days after due date — no late fee charged if paid within grace period. Late fee: 5% of EMI amount or $25, whichever is greater, applied after grace period. Reporting: Payments overdue by 30+ days are reported to credit bureaus. Default: Loan is classified as Non-Performing Asset (NPA) after 90 days of missed payment. Consequences of default: Credit score impact, collection calls starting at 60 days, legal action after 180 days. Restructuring: Members facing financial hardship can request loan restructuring by contacting the lending department — this may extend the loan term or temporarily reduce EMI. No prepayment penalty for loans — you can pay off your loan early at any time without additional fees.",
+    keywords: ["EMI", "payment", "late", "default", "grace", "prepayment", "restructure", "overdue", "missed"]
+  }
+];
+
+// ============================================================
+// INTENT CLASSIFICATION ENGINE
+// ============================================================
+const intentDefinitions = [
+  {
+    id: "balance_inquiry",
+    label: "Balance Inquiry",
+    patterns: ["balance", "how much", "what's in my account", "available balance", "current balance", "account balance", "money in my account", "check balance"],
+    autoResolve: true,
+    sentimentWeight: 0 // neutral
+  },
+  {
+    id: "transaction_dispute",
+    label: "Transaction Dispute",
+    patterns: ["dispute", "unrecognized charge", "didn't make", "don't recognize", "unauthorized", "fraudulent", "wrong charge", "charged twice", "overcharged", "didn't authorize", "strange charge", "suspicious"],
+    autoResolve: false, // can start process but may escalate
+    sentimentWeight: 2
+  },
+  {
+    id: "loan_status",
+    label: "Loan Status",
+    patterns: ["loan status", "loan application", "approved", "pending loan", "when will loan", "personal loan", "heard back", "loan decision", "loan approved", "loan rejected", "disbursed"],
+    autoResolve: true,
+    sentimentWeight: 0
+  },
+  {
+    id: "card_block",
+    label: "Card Block/Unblock",
+    patterns: ["card blocked", "card not working", "failed PIN", "PIN failed", "reactivate card", "unblock card", "debit card blocked", "card declined", "locked card", "unlock card"],
+    autoResolve: true,
+    sentimentWeight: 1
+  },
+  {
+    id: "account_update",
+    label: "Account Update",
+    patterns: ["update address", "change address", "moved", "new address", "relocate", "update phone", "change phone", "update email", "personal details", "change name"],
+    autoResolve: true,
+    sentimentWeight: 0
+  },
+  {
+    id: "policy_question",
+    label: "Policy Question",
+    patterns: ["penalty", "policy", "fixed deposit", "premature", "interest rate", "fee", "charges", "maturity", "rules", "what happens if", "closing fd", "fd penalty", "grace period"],
+    autoResolve: true,
+    sentimentWeight: 0
+  },
+  {
+    id: "escalation_complaint",
+    label: "Unresolved Complaint",
+    patterns: ["called twice", "nothing resolved", "overcharged for months", "no help", "frustrated", "complaint", "supervisor", "manager", "nobody helped", "still not fixed", "third time", "worse"],
+    autoResolve: false, // always escalates
+    sentimentWeight: 4
+  },
+  {
+    id: "credit_card",
+    label: "Credit Card Query",
+    patterns: ["credit card", "credit limit", "credit card rate", "annual fee", "cash advance", "credit card balance", "credit card statement", "credit card payment"],
+    autoResolve: true,
+    sentimentWeight: 0
+  },
+  {
+    id: "overdraft",
+    label: "Overdraft Query",
+    patterns: ["overdraft", "overdrawn", "bounced", "NSF", "insufficient funds", "negative balance", "overdraft fee", "overdraft protection"],
+    autoResolve: true,
+    sentimentWeight: 1
+  },
+  {
+    id: "transfer",
+    label: "Transfer/Wire",
+    patterns: ["wire transfer", "ACH", "send money", "transfer", "routing number", "SWIFT", "direct deposit", "incoming transfer"],
+    autoResolve: true,
+    sentimentWeight: 0
+  },
+  {
+    id: "digital_banking",
+    label: "Digital Banking Issue",
+    patterns: ["app not working", "can't log in", "login", "password", "OTP", "biometric", "mobile app", "online banking", "website", "portal"],
+    autoResolve: true,
+    sentimentWeight: 1
+  },
+  {
+    id: "account_closure",
+    label: "Account Closure",
+    patterns: ["close account", "close my account", "account closure", "cancel account", "want to close", "closing account"],
+    autoResolve: true,
+    sentimentWeight: 0
+  },
+  {
+    id: "loan_emi",
+    label: "Loan EMI/Payment",
+    patterns: ["EMI", "loan payment", "missed payment", "late payment", "prepayment", "pay off loan", "loan due", "default", "restructure"],
+    autoResolve: true,
+    sentimentWeight: 1
+  }
+];
+
+// ============================================================
+// SENTIMENT ANALYSIS ENGINE
+// ============================================================
+const sentimentLexicon = {
+  positive: ["thanks", "thank you", "great", "helpful", "appreciate", "good", "excellent", "perfect", "resolved", "happy", "satisfied"],
+  negative: ["frustrated", "angry", "upset", "terrible", "worst", "unacceptable", "ridiculous", "outrageous", "disgusted", "annoyed", "fed up", "furious"],
+  distress: ["urgent", "emergency", "desperate", "please help", "critical", "serious", "stolen", "hacked", "someone used", "identity theft"],
+  escalation: ["called twice", "called three", "nothing resolved", "nobody helped", "still not", "third time", "again", "overcharged for", "months", "no response", "ignored"]
+};
+
+function analyzeSentiment(text) {
+  const lower = text.toLowerCase();
+  let score = 0;
+  let flags = [];
+
+  sentimentLexicon.positive.forEach(w => { if (lower.includes(w)) { score -= 1; flags.push("positive"); } });
+  sentimentLexicon.negative.forEach(w => { if (lower.includes(w)) { score += 3; flags.push("negative"); } });
+  sentimentLexicon.distress.forEach(w => { if (lower.includes(w)) { score += 4; flags.push("distress"); } });
+  sentimentLexicon.escalation.forEach(w => { if (lower.includes(w)) { score += 5; flags.push("escalation_history"); } });
+
+  // Exclamation marks add intensity
+  const exclamations = (text.match(/!/g) || []).length;
+  if (score > 0) score += Math.min(exclamations, 3);
+
+  // ALL CAPS detection
+  const words = text.split(/\s+/);
+  const capsWords = words.filter(w => w.length > 2 && w === w.toUpperCase()).length;
+  if (capsWords > 2) { score += 2; flags.push("all_caps"); }
+
+  let level, label, color;
+  if (score <= 0) { level = "positive"; label = "Calm"; color = "var(--green)"; }
+  else if (score <= 2) { level = "neutral"; label = "Neutral"; color = "var(--accent)"; }
+  else if (score <= 5) { level = "concerned"; label = "Concerned"; color = "var(--gold)"; }
+  else if (score <= 8) { level = "frustrated"; label = "Frustrated"; color = "var(--orange)"; }
+  else { level = "distressed"; label = "Distressed"; color = "var(--red)"; }
+
+  return { score, level, label, color, flags, isPriority: score >= 6 };
+}
+
+// ============================================================
+// RAG RETRIEVAL ENGINE
+// ============================================================
+function retrieveFromKB(query, intentId) {
+  const lower = query.toLowerCase();
+  const queryWords = lower.split(/\s+/).filter(w => w.length > 2);
+
+  let scored = knowledgeBase.map(doc => {
+    let score = 0;
+
+    // Keyword matching from doc.keywords
+    doc.keywords.forEach(kw => {
+      if (lower.includes(kw.toLowerCase())) score += 3;
+    });
+
+    // Word overlap
+    const contentLower = doc.content.toLowerCase();
+    const titleLower = doc.title.toLowerCase();
+    queryWords.forEach(w => {
+      if (titleLower.includes(w)) score += 4;
+      if (contentLower.includes(w)) score += 1;
+    });
+
+    // Intent-based boost
+    const intentKBMap = {
+      balance_inquiry: ["KB001"],
+      transaction_dispute: ["KB002"],
+      loan_status: ["KB003"],
+      card_block: ["KB004"],
+      account_update: ["KB005"],
+      policy_question: ["KB006", "KB007", "KB009"],
+      credit_card: ["KB007"],
+      overdraft: ["KB009"],
+      transfer: ["KB010"],
+      digital_banking: ["KB008"],
+      account_closure: ["KB011"],
+      loan_emi: ["KB012"]
+    };
+
+    if (intentKBMap[intentId] && intentKBMap[intentId].includes(doc.id)) {
+      score += 10;
+    }
+
+    return { ...doc, relevanceScore: score };
+  });
+
+  scored.sort((a, b) => b.relevanceScore - a.relevanceScore);
+  return scored.filter(d => d.relevanceScore > 2).slice(0, 3);
+}
+
+// ============================================================
+// RESPONSE GENERATION ENGINE
+// ============================================================
+function generateResponse(query, intent, retrievedDocs, conversationHistory) {
+  const primaryDoc = retrievedDocs[0];
+
+  if (!primaryDoc) {
+    return {
+      text: "I appreciate you reaching out. Your query touches on a specific area where I'd like to ensure you receive the most accurate information. Let me connect you with a specialist who can assist you personally.",
+      sources: [],
+      escalated: true,
+      escalationReason: "No relevant knowledge base documents found for the query. Requires human expertise."
+    };
+  }
+
+  // Check if this is an unresolved complaint pattern
+  if (intent.id === "escalation_complaint") {
+    return {
+      text: "I sincerely apologize that your previous attempts to resolve this haven't been successful. That's not the experience we want for any member. I'm escalating this immediately to our senior resolution team with full context of your previous interactions. A team member will reach out to you within 2 hours. Your case has been flagged as high priority.\n\nIn the meantime, I've noted the following from our records:\n• You've contacted us " + (conversationHistory.length > 2 ? "multiple times" : "previously") + " regarding this issue\n• The issue involves potential overcharging\n• This requires a review of your account history for the past 3 months",
+      sources: retrievedDocs.map(d => d.id),
+      escalated: true,
+      escalationReason: "Member reports unresolved issue after multiple contact attempts. Sentiment indicates frustration. Requires senior staff intervention with account history review."
+    };
+  }
+
+  // For disputes — provide process but also flag if it seems complex
+  if (intent.id === "transaction_dispute") {
+    const isComplex = query.toLowerCase().includes("overcharged") || query.toLowerCase().includes("months");
+    if (isComplex) {
+      return {
+        text: "I understand your concern, and I want to make sure this is handled thoroughly. Based on our dispute policy (KB002), here's what I can confirm:\n\n• You have 60 days from the statement date to file a dispute per Regulation E\n• A provisional credit would be applied within 10 business days\n• Full investigation takes up to 45 days\n\nHowever, since this appears to involve a recurring overcharge pattern rather than a single transaction, I'm escalating this to our disputes specialist who can review your transaction history across multiple billing cycles. They'll have the full context and will contact you within 4 business hours.",
+        sources: ["KB002"],
+        escalated: true,
+        escalationReason: "Recurring overcharge pattern detected. Requires multi-month transaction history review by disputes specialist."
+      };
+    }
+    return {
+      text: "I can help you file a transaction dispute right away. Based on our Dispute Filing Procedure:\n\n**What you'll need to provide:**\n• Transaction date and amount\n• Merchant name on the charge\n• Reason for the dispute\n\n**What happens next:**\n• A provisional credit for the disputed amount will be applied within **10 business days**\n• Full investigation takes up to **45 calendar days**\n• You'll receive the final determination via secure message\n\n**To proceed:** Please share the transaction details (date, amount, merchant), and I'll initiate the dispute immediately. No fee is charged for filing.",
+      sources: ["KB002"],
+      escalated: false
+    };
+  }
+
+  // For other auto-resolvable intents, build response from KB content
+  const responseMap = {
+    balance_inquiry: () => {
+      return "Your account balance information is available in real-time. Here's what you should know:\n\n• **Current Balance** and **Available Balance** may differ when holds are placed on recent deposits\n• Pending transactions may take up to **24 hours** to settle\n• You can also check your balance via the mobile app or any ATM\n\nWould you like me to provide your specific current and available balance? (Note: For security, I can share a masked summary — full details are available in the mobile app with biometric verification.)";
+    },
+    loan_status: () => {
+      return "Here's the personal loan processing timeline from our policy:\n\n• **Application review:** 2-3 business days\n• **Credit decision:** Within 5 business days from complete submission\n• **Disbursement:** 2 business days after signing the agreement\n\nIf your application was submitted 5 days ago and you haven't heard back, it likely means:\n1. Additional documents may be needed (check your email/secure messages)\n2. The application is still under credit review\n\n**Current Rates:**\n• 8.99% APR (credit score 750+)\n• 11.49% APR (credit score 700-749)\n• 14.99% APR (credit score 650-699)\n\nDo you have your application reference number? I can look up the specific status.";
+    },
+    card_block: () => {
+      return "Here are your options to unblock your debit card after failed PIN attempts:\n\n**Option A — Visit a Branch**\nBring a valid government-issued photo ID. The card can be unblocked immediately at the teller counter.\n\n**Option B — Self-Service via Mobile App**\nIf your phone number is verified, you can perform a PIN reset through the app with OTP verification.\n\n**Option C — Call Member Support**\nCall **1-800-CU-HELP** and verify your identity with security questions.\n\n**For Lost/Stolen Cards:**\nUse the mobile app's 'Lock Card' feature immediately, or call the number above. Replacement cards arrive in 5-7 business days (expedited: 1 business day for $15).";
+    },
+    account_update: () => {
+      return "To update your registered address, here's what you need:\n\n**Required Documents:**\n• Completed Address Change Form (AC-201)\n• One proof of new address: utility bill (dated within 30 days), lease agreement, or government-issued mail\n\n**How to Submit:**\n• **Online (easiest):** Log into the member portal with 2FA enabled — no physical documents needed\n• **In Person:** Visit any branch with the documents listed above\n\n**Processing Time:** 2-3 business days\n\nNote: Address update does not change your account number or debit card. If you also need to update your name, a government-issued photo ID with the new name is required.";
+    },
+    policy_question: () => {
+      return primaryDoc.content;
+    },
+    credit_card: () => {
+      return "Here are our credit card details:\n\n| Card | Purchase APR | Cash Advance APR | Annual Fee |\n|------|-------------|-----------------|------------|\n| Platinum | 14.99% | 24.99% | $0 |\n| Gold | 11.99% | 22.99% | $0 |\n| Secured | 18.99% | N/A | $25 |\n\n**Key Policies:**\n• Grace period: 25 days (if previous balance paid in full)\n• Late fee: $29 (balance <$1,000) / $39 (balance ≥$1,000)\n• Min. payment: Greater of $25 or 2% of balance\n• Foreign transaction fee: 1%\n• Cash advance fee: $10 or 3%, whichever is greater\n\nWould you like details on any specific aspect?";
+    },
+    overdraft: () => {
+      return "Here are your overdraft protection options:\n\n**1. Savings Transfer (Recommended — $0 fee)**\nAutomatically transfers from savings in $100 increments to cover overdrafts.\n\n**2. Overdraft Line of Credit**\nUp to $1,000 credit line at 18.00% APR. No per-transaction fee.\n\n**3. Standard Overdraft (Opt-in required)**\n$28 per item (max 4/day = $112). If you don't opt in, debit card transactions are simply declined at no charge.\n\nYou can enroll in any of these options at a branch, via the member portal, or by calling member support.";
+    },
+    transfer: () => {
+      return "Here's our transfer information:\n\n**Domestic Wire:** Same day if before 3 PM ET. Fee: $20 outgoing, $0 incoming.\n**International Wire:** 1-2 business days. Fee: $45 outgoing. Needs SWIFT code and IBAN.\n**ACH Transfer:** Free, 2-3 business days.\n\n**Credit Union Routing Number:** 021000021\n\nFor ACH debit blocks (prevent unauthorized debits), submit form ACH-BLOCK at any branch.";
+    },
+    digital_banking: () => {
+      return "Here are solutions for common digital banking issues:\n\n**Can't log in:** Use 'Forgot Password' link. After 5 failed attempts, account locks for 30 minutes.\n**App not loading:** Update to latest version, clear app cache. Requires iOS 14+ or Android 10+.\n**OTP not received:** Check spam, verify registered number, wait 60s to resend.\n**Biometric not working:** Re-enable in Settings > Security.\n**Transaction failed but debited:** Auto-reverses in 5-7 business days. File dispute if not reversed after 7 days.\n\nPersistent issues? Contact techsupport@crestviewcu.org";
+    },
+    account_closure: () => {
+      return "To close your account:\n\n1. Wait 5-7 business days after last transaction for pending items to clear\n2. Withdraw balance or request cashier's check\n3. Update any direct deposits or auto-payments to a new account\n4. Visit a branch with photo ID, or submit written request via secure message\n5. Destroy all debit cards and checks\n\n**Processing:** 1-2 business days. Negative balance at closure is still your responsibility.\n\n**Important:** Dormant accounts (12 months no activity) incur a $5/month fee. Accounts dormant 3+ years may be escheated to the state.";
+    },
+    loan_emi: () => {
+      return "Here's what you need to know about loan EMI payments:\n\n**Grace Period:** 10 days after due date — no late fee if paid within this window.\n**Late Fee:** 5% of EMI or $25, whichever is greater.\n**Credit Reporting:** 30+ days overdue = reported to credit bureaus.\n**Default (NPA):** 90 days missed payment.\n\n**Good news:** There is **NO prepayment penalty** — you can pay off your loan early at any time.\n\n**Facing hardship?** Request loan restructuring through the lending department — this may extend the term or temporarily reduce EMI. Don't wait until default — reach out as early as possible.";
+    }
+  };
+
+  const generator = responseMap[intent.id];
+  if (generator) {
+    return {
+      text: generator(),
+      sources: retrievedDocs.map(d => d.id),
+      escalated: false
+    };
+  }
+
+  // Fallback
+  return {
+    text: primaryDoc.content,
+    sources: [primaryDoc.id],
+    escalated: false
+  };
+}
+
+// ============================================================
+// FULL AI PIPELINE
+// ============================================================
+function classifyIntent(text) {
+  const lower = text.toLowerCase();
+  let bestMatch = null;
+  let bestScore = 0;
+
+  intentDefinitions.forEach(intent => {
+    let score = 0;
+    intent.patterns.forEach(pattern => {
+      if (lower.includes(pattern.toLowerCase())) {
+        score += pattern.split(/\s+/).length; // multi-word patterns score higher
+      }
+    });
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = intent;
+    }
+  });
+
+  return bestMatch || { id: "unknown", label: "General Inquiry", autoResolve: false, sentimentWeight: 0 };
+}
+
+async function processMemberMessage(text) {
+  // Step 1: Classify intent
+  const intent = classifyIntent(text);
+
+  // Step 2: Analyze sentiment
+  const sentiment = analyzeSentiment(text);
+
+  // Step 3: Retrieve from knowledge base
+  const retrievedDocs = retrieveFromKB(text, intent.id);
+
+  // Step 4: Generate response
+  const response = generateResponse(text, intent, retrievedDocs, currentConversation);
+
+  // Step 5: Determine if escalation needed
+  const needsEscalation = response.escalated || !intent.autoResolve || sentiment.isPriority;
+
+  return {
+    intent,
+    sentiment,
+    retrievedDocs,
+    response: response.text,
+    sources: response.sources,
+    escalated: needsEscalation,
+    escalationReason: response.escalationReason || (needsEscalation ? "Auto-escalated based on sentiment/policy" : null)
+  };
+}
+
+// ============================================================
+// CASE MANAGEMENT STATE
+// ============================================================
+let cases = [];
+let selectedCaseId = null;
+let currentConversation = [];
+let currentFilter = "all";
+
+function createCase(memberMessage, aiResult) {
+  const caseId = "CS-" + String(cases.length + 1001).padStart(4, "0");
+  const now = new Date();
+
+  const memberNames = ["Sarah Palmer", "James Rodriguez", "Emily Chen", "Michael Brooks", "Priya Sharma", "David Kim", "Lisa Thompson", "Robert Martinez"];
+  const memberInitials = ["SP", "JR", "EC", "MB", "PS", "DK", "LT", "RM"];
+
+  const randomIndex = cases.length % memberNames.length;
+
+  const newCase = {
+    id: caseId,
+    memberId: "CU-2024-" + String(8472 + cases.length).padStart(5, "0"),
+    memberName: memberNames[randomIndex],
+    memberInitials: memberInitials[randomIndex],
+    intent: aiResult.intent.label,
+    intentId: aiResult.intent.id,
+    sentiment: aiResult.sentiment,
+    status: aiResult.escalated ? "escalated" : "resolved",
+    isPriority: aiResult.sentiment.isPriority,
+    messages: [
+      { role: "member", text: memberMessage, time: now.toISOString() },
+      { role: "ai", text: aiResult.response, time: new Date(now.getTime() + 1500).toISOString(), sources: aiResult.sources }
+    ],
+    escalationReason: aiResult.escalationReason,
+    retrievedDocs: aiResult.retrievedDocs.map(d => ({ id: d.id, title: d.title, relevance: d.relevanceScore })),
+    createdAt: now.toISOString(),
+    resolvedAt: aiResult.escalated ? null : new Date(now.getTime() + 2000).toISOString(),
+    resolvedBy: aiResult.escalated ? null : "AI Engine"
+  };
+
+  cases.unshift(newCase);
+  return newCase;
+}
+
+// Seed some initial cases for the dashboard
+function seedInitialCases() {
+  const seedData = [
+    {
+      msg: "What is my current account balance?",
+      intentId: "balance_inquiry", status: "resolved",
+      aiResponse: "Your current account balance is $4,287.53 with $3,950.00 available (a hold of $337.53 is pending from a recent debit card transaction). You can also check real-time balance via the mobile app.",
+      sources: ["KB001"], sentimentScore: 0, sentimentLabel: "Neutral"
+    },
+    {
+      msg: "I see a charge for $89.99 from TECHSTORE ONLINE that I didn't make.",
+      intentId: "transaction_dispute", status: "escalated",
+      aiResponse: "I understand your concern about this unrecognized charge. I'm initiating the dispute process for the $89.99 charge from TECHSTORE ONLINE. A provisional credit will be applied within 10 business days. However, I'm escalating this to our disputes team for thorough investigation.",
+      sources: ["KB002"], sentimentScore: 3, sentimentLabel: "Concerned",
+      escReason: "Unrecognized charge reported. Dispute initiated but escalated for specialist review."
+    },
+    {
+      msg: "What's the penalty if I close my fixed deposit before the maturity date?",
+      intentId: "policy_question", status: "resolved",
+      aiResponse: "If closed before 6 months: no interest paid, only principal returned. If closed after 6 months but before maturity: interest at the rate for the period held minus 1% penalty. No penalty for closure due to member's death.",
+      sources: ["KB006"], sentimentScore: 0, sentimentLabel: "Neutral"
+    },
+    {
+      msg: "My debit card got blocked after 3 failed PINs. How do I get it reactivated?",
+      intentId: "card_block", status: "resolved",
+      aiResponse: "You have three options: (A) Visit any branch with a valid government ID for immediate unblocking, (B) Use the mobile app's self-service PIN reset with OTP verification, or (C) Call 1-800-CU-HELP and verify with security questions.",
+      sources: ["KB004"], sentimentScore: 1, sentimentLabel: "Concerned"
+    },
+    {
+      msg: "I've been overcharged for three months. I've called twice and nothing has been resolved.",
+      intentId: "escalation_complaint", status: "escalated",
+      aiResponse: "I sincerely apologize that your previous attempts to resolve this haven't been successful. I'm escalating this immediately to our senior resolution team. A team member will reach out within 2 hours. Your case has been flagged as high priority.",
+      sources: ["KB002"], sentimentScore: 10, sentimentLabel: "Distressed",
+      escReason: "Member reports recurring overcharge over 3 months with 2 prior unresolved contacts. Sentiment: distressed. Requires senior staff intervention."
+    },
+    {
+      msg: "I applied for a personal loan 5 days ago and haven't heard back.",
+      intentId: "loan_status", status: "resolved",
+      aiResponse: "Credit decisions are made within 5 business days from complete submission. Since it's been 5 days, your application may be under final review, or additional documents may be needed. Check your email and secure messages for any requests.",
+      sources: ["KB003"], sentimentScore: 0, sentimentLabel: "Neutral"
+    }
+  ];
+
+  seedData.forEach((seed, i) => {
+    const memberNames = ["Sarah Palmer", "James Rodriguez", "Emily Chen", "Michael Brooks", "Priya Sharma", "David Kim"];
+    const memberInitials = ["SP", "JR", "EC", "MB", "PS", "DK"];
+    const hoursAgo = (i + 1) * 2;
+    const created = new Date(Date.now() - hoursAgo * 3600000);
+
+    cases.push({
+      id: "CS-" + String(1001 + i).padStart(4, "0"),
+      memberId: "CU-2024-" + String(8472 + i).padStart(5, "0"),
+      memberName: memberNames[i],
+      memberInitials: memberInitials[i],
+      intent: classifyIntent(seed.msg).label,
+      intentId: seed.intentId,
+      sentiment: { score: seed.sentimentScore, level: seed.sentimentScore > 5 ? "distressed" : seed.sentimentScore > 2 ? "concerned" : "neutral", label: seed.sentimentLabel, color: seed.sentimentScore > 5 ? "var(--red)" : seed.sentimentScore > 2 ? "var(--gold)" : "var(--accent)" },
+      status: seed.status,
+      isPriority: seed.sentimentScore >= 6,
+      messages: [
+        { role: "member", text: seed.msg, time: created.toISOString() },
+        { role: "ai", text: seed.aiResponse, time: new Date(created.getTime() + 1500).toISOString(), sources: seed.sources }
+      ],
+      escalationReason: seed.escReason || null,
+      retrievedDocs: seed.sources.map(s => {
+        const doc = knowledgeBase.find(k => k.id === s);
+        return doc ? { id: doc.id, title: doc.title, relevance: 10 } : null;
+      }).filter(Boolean),
+      createdAt: created.toISOString(),
+      resolvedAt: seed.status === "resolved" ? new Date(created.getTime() + 2000).toISOString() : null,
+      resolvedBy: seed.status === "resolved" ? "AI Engine" : null
+    });
+  });
+}
+
+// ============================================================
+// UI RENDERING — MEMBER CHAT
+// ============================================================
+const chatMessages = document.getElementById("chatMessages");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+const typingIndicator = document.getElementById("typingIndicator");
+
+function addMessage(role, text, sources) {
+  const div = document.createElement("div");
+  div.className = `message ${role}`;
+
+  const avatarIcon = role === "ai" ? '<i class="fas fa-robot" style="font-size:12px;"></i>' : '<i class="fas fa-user" style="font-size:12px;"></i>';
+  const avatarClass = role === "ai" ? "msg-avatar" : "msg-avatar";
+
+  let sourceHTML = "";
+  if (sources && sources.length > 0) {
+    const docTitles = sources.map(s => {
+      const doc = knowledgeBase.find(k => k.id === s);
+      return doc ? `<i class="fas fa-database"></i> ${doc.title}` : "";
+    }).filter(Boolean).join(" &nbsp;|&nbsp; ");
+    sourceHTML = `<div class="source-tag">${docTitles}</div>`;
+  }
+
+  // Simple markdown-like formatting
+  let formatted = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>')
+    .replace(/\|(.+)\|/g, (match) => {
+      return `<span style="font-family:monospace;font-size:12px;background:var(--bg-elevated);padding:2px 6px;border-radius:4px;display:inline-block;margin:2px 0;">${match.replace(/\|/g, ' │ ')}</span>`;
+    });
+
+  // Check for escalation in text
+  let escalationHTML = "";
+  if (text.includes("escalat") || text.includes("senior") || text.includes("specialist") || text.includes("high priority")) {
+    escalationHTML = `<div class="escalation-tag"><i class="fas fa-arrow-up"></i> Escalated to Staff</div>`;
+  }
+
+  div.innerHTML = `
+    <div class="${avatarClass}">${avatarIcon}</div>
+    <div class="msg-bubble">${formatted}${sourceHTML}${escalationHTML}</div>
+  `;
+
+  chatMessages.appendChild(div);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+  return div;
+}
+
+function showTyping() {
+  typingIndicator.classList.add("show");
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function hideTyping() {
+  typingIndicator.classList.remove("show");
+}
+
+function getWelcomeMessage() {
+  return `Welcome to BANKBOT, Sarah. I'm here to help you with your credit union account.\n\nI can assist you with:\n• **Balance inquiries** and account information\n• **Transaction disputes** and fraud reports\n• **Loan status** and rate information\n• **Card block/unblock** requests\n• **Address and account updates**\n• **Policy questions** about FDs, fees, and more\n\nAll my responses are grounded in Crestview Credit Union's actual policies — not general knowledge.\n\nHow can I help you today?`;
+}
+
+// Initialize welcome
+addMessage("ai", getWelcomeMessage(), []);
+
+async function sendMessage() {
+  const text = chatInput.value.trim();
+  if (!text) return;
+
+  chatInput.value = "";
+  chatInput.style.height = "auto";
+  sendBtn.disabled = true;
+
+  currentConversation.push({ role: "member", text });
+
+  addMessage("member", text);
+  showTyping();
+
+  // Simulate processing delay (RAG pipeline)
+  await new Promise(r => setTimeout(r, 800 + Math.random() * 700));
+
+  const result = await processMemberMessage(text);
+
+  currentConversation.push({ role: "ai", text: result.response });
+
+  hideTyping();
+  addMessage("ai", result.response, result.sources);
+
+  // Create case in the system
+  const newCase = createCase(text, result);
+
+  if (result.escalated) {
+    showToast("warning", `Case ${newCase.id} escalated — visible in Staff Dashboard`);
+  } else {
+    showToast("success", `Case ${newCase.id} auto-resolved by AI`);
+  }
+
+  sendBtn.disabled = false;
+  chatInput.focus();
+}
+
+function sendQuickAction(text) {
+  chatInput.value = text;
+  sendMessage();
+}
+
+// Input handlers
+sendBtn.addEventListener("click", sendMessage);
+chatInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+chatInput.addEventListener("input", () => {
+  chatInput.style.height = "auto";
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + "px";
+});
+
+// Voice input
+const voiceBtn = document.getElementById("voiceBtn");
+let isRecording = false;
+let recognition = null;
+
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recognition = new SpeechRecognition();
+  recognition.continuous = false;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = (event) => {
+    let transcript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    chatInput.value = transcript;
+    chatInput.style.height = "auto";
+    chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + "px";
+  };
+
+  recognition.onend = () => {
+    isRecording = false;
+    voiceBtn.classList.remove("recording");
+    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+    if (chatInput.value.trim()) {
+      setTimeout(sendMessage, 300);
+    }
+  };
+
+  recognition.onerror = () => {
+    isRecording = false;
+    voiceBtn.classList.remove("recording");
+    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+    showToast("info", "Voice input ended. Try again or type your message.");
+  };
+}
+
+voiceBtn.addEventListener("click", () => {
+  if (!recognition) {
+    showToast("info", "Voice input is not supported in this browser. Try Chrome.");
+    return;
+  }
+  if (isRecording) {
+    recognition.stop();
+  } else {
+    isRecording = true;
+    voiceBtn.classList.add("recording");
+    voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
+    recognition.start();
+  }
+});
+
+// ============================================================
+// UI RENDERING — STAFF DASHBOARD
+// ============================================================
+function renderStats() {
+  const total = cases.length;
+  const resolved = cases.filter(c => c.status === "resolved").length;
+  const escalated = cases.filter(c => c.status === "escalated").length;
+  const pending = cases.filter(c => c.status === "pending").length;
+  const priorityCount = cases.filter(c => c.isPriority).length;
+
+  document.getElementById("statsGrid").innerHTML = `
+    <div class="stat-card sc-total">
+      <div class="stat-icon"><i class="fas fa-inbox"></i></div>
+      <div class="stat-value">${total}</div>
+      <div class="stat-label">Total Cases</div>
+      <div class="stat-change up"><i class="fas fa-arrow-up"></i> ${cases.filter(c => new Date(c.createdAt) > new Date(Date.now() - 3600000)).length} in last hour</div>
+    </div>
+    <div class="stat-card sc-resolved">
+      <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+      <div class="stat-value">${resolved}</div>
+      <div class="stat-label">Auto-Resolved by AI</div>
+      <div class="stat-change up"><i class="fas fa-percentage"></i> ${total ? Math.round(resolved/total*100) : 0}% resolution rate</div>
+    </div>
+    <div class="stat-card sc-pending">
+      <div class="stat-icon"><i class="fas fa-clock"></i></div>
+      <div class="stat-value">${pending}</div>
+      <div class="stat-label">Pending Review</div>
+    </div>
+    <div class="stat-card sc-escalated">
+      <div class="stat-icon"><i class="fas fa-exclamation-circle"></i></div>
+      <div class="stat-value">${escalated}</div>
+      <div class="stat-label">Needs Attention${priorityCount ? ` (${priorityCount} priority)` : ''}</div>
+      <div class="stat-change ${escalated > 2 ? 'down' : 'up'}"><i class="fas fa-${escalated > 2 ? 'arrow-up' : 'arrow-down'}"></i> ${escalated > 2 ? 'Above normal' : 'Within normal'}</div>
+    </div>
+  `;
+}
+
+function renderCasesList() {
+  const filtered = currentFilter === "all" ? cases : cases.filter(c => c.status === currentFilter);
+  const list = document.getElementById("casesList");
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div style="padding:40px;text-align:center;color:var(--text-muted);font-size:13px;">
+      <i class="fas fa-filter" style="font-size:24px;margin-bottom:12px;opacity:0.3;display:block;"></i>
+      No cases match this filter
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(c => {
+    const statusClass = c.status;
+    const timeAgo = getTimeAgo(c.createdAt);
+    const firstMsg = c.messages[0]?.text || "";
+    const priorityBadge = c.isPriority ? `<span class="case-badge priority"><i class="fas fa-bolt" style="font-size:9px;"></i> Priority</span>` : "";
+
+    return `
+      <div class="case-item ${selectedCaseId === c.id ? 'selected' : ''}" onclick="selectCase('${c.id}')">
+        <div class="case-item-header">
+          <div class="case-member">
+            <div class="case-member-avatar">${c.memberInitials}</div>
+            ${c.memberName}
+          </div>
+          <div style="display:flex;gap:4px;align-items:center;">
+            ${priorityBadge}
+            <span class="case-badge ${statusClass}">${c.status}</span>
+          </div>
+        </div>
+        <div class="case-preview">${firstMsg}</div>
+        <div class="case-meta">
+          <span><i class="fas fa-tag"></i> ${c.intent}</span>
+          <span><i class="fas fa-clock"></i> ${timeAgo}</span>
+          <span><i class="fas fa-hashtag"></i> ${c.id}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function selectCase(caseId) {
+  selectedCaseId = caseId;
+  renderCasesList();
+  renderCaseDetail();
+  document.getElementById("detailActions").style.display = "flex";
+}
+
+function closeDetail() {
+  selectedCaseId = null;
+  renderCasesList();
+  document.getElementById("detailContent").innerHTML = `
+    <div class="detail-empty">
+      <i class="fas fa-hand-pointer"></i>
+      <p>Select a case from the queue<br>to view full details</p>
+    </div>`;
+  document.getElementById("detailActions").style.display = "none";
+}
+
+function renderCaseDetail() {
+  const c = cases.find(x => x.id === selectedCaseId);
+  if (!c) return;
+
+  const sentimentPercent = Math.min(100, Math.max(5, (c.sentiment.score / 12) * 100));
+
+  let escalationHTML = "";
+  if (c.escalationReason) {
+    escalationHTML = `
+      <div class="detail-section">
+        <div class="detail-section-title"><i class="fas fa-arrow-up" style="color:var(--orange);"></i> Escalation Summary</div>
+        <div class="escalation-summary">
+          <h4><i class="fas fa-exclamation-triangle"></i> Reason for Escalation</h4>
+          <p style="font-size:12px;color:var(--text-secondary);line-height:1.5;margin-bottom:10px;">${c.escalationReason}</p>
+          <ul>
+            <li>Member sentiment: <strong style="color:${c.sentiment.color}">${c.sentiment.label}</strong></li>
+            <li>Intent classified: <strong>${c.intent}</strong></li>
+            <li>Previous contacts: ${c.sentiment.flags?.includes("escalation_history") ? "Yes — multiple prior attempts" : "No prior record"}</li>
+            <li>Recommended action: ${c.isPriority ? "Immediate senior review" : "Standard escalation queue"}</li>
+          </ul>
+        </div>
+      </div>`;
+  }
+
+  const kbDocs = c.retrievedDocs.map(d => `
+    <div style="padding:8px 12px;background:var(--bg-elevated);border-radius:6px;font-size:12px;margin-bottom:4px;display:flex;align-items:center;gap:8px;">
+      <i class="fas fa-database" style="color:var(--accent);font-size:10px;"></i>
+      <span style="color:var(--text-secondary);">${d.title}</span>
+      <span style="margin-left:auto;color:var(--text-muted);font-size:10px;">Score: ${d.relevance}</span>
+    </div>
+  `).join("");
+
+  const conversationHTML = c.messages.map(m => `
+    <div class="detail-msg ${m.role === 'member' ? 'member-msg' : 'ai-msg'}">
+      <div class="detail-msg-role">${m.role === 'member' ? 'Member' : 'AI Engine'} — ${formatTime(m.time)}</div>
+      <div>${m.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</div>
+      ${m.sources && m.sources.length ? `<div style="margin-top:6px;font-size:10px;color:var(--accent);"><i class="fas fa-database"></i> Sources: ${m.sources.join(', ')}</div>` : ''}
+    </div>
+  `).join("");
+
+  document.getElementById("detailContent").innerHTML = `
+    <div class="detail-section">
+      <div class="detail-section-title"><i class="fas fa-user"></i> Member Information</div>
+      <div class="detail-info-grid">
+        <div class="detail-info-item">
+          <div class="detail-info-label">Name</div>
+          <div class="detail-info-value">${c.memberName}</div>
+        </div>
+        <div class="detail-info-item">
+          <div class="detail-info-label">Member ID</div>
+          <div class="detail-info-value">${c.memberId}</div>
+        </div>
+        <div class="detail-info-item">
+          <div class="detail-info-label">Case ID</div>
+          <div class="detail-info-value">${c.id}</div>
+        </div>
+        <div class="detail-info-item">
+          <div class="detail-info-label">Intent</div>
+          <div class="detail-info-value">${c.intent}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title"><i class="fas fa-heart" style="color:${c.sentiment.color};"></i> Sentiment Analysis</div>
+      <div class="sentiment-indicator">
+        <div class="sentiment-label" style="color:${c.sentiment.color};">${c.sentiment.label}</div>
+        <div class="sentiment-bar">
+          <div class="sentiment-fill" style="width:${sentimentPercent}%;background:${c.sentiment.color};"></div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);">${c.sentiment.score}/12</div>
+      </div>
+      ${c.sentiment.flags?.length ? `<div style="margin-top:8px;display:flex;gap:4px;flex-wrap:wrap;">${c.sentiment.flags.map(f => `<span style="padding:3px 8px;background:var(--bg-elevated);border-radius:4px;font-size:10px;color:var(--text-muted);">${f}</span>`).join("")}</div>` : ""}
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title"><i class="fas fa-database" style="color:var(--accent);"></i> Knowledge Base Retrieved</div>
+      ${kbDocs || '<div style="font-size:12px;color:var(--text-muted);">No documents retrieved</div>'}
+    </div>
+
+    ${escalationHTML}
+
+    <div class="detail-section">
+      <div class="detail-section-title"><i class="fas fa-comments"></i> Full Conversation</div>
+      <div class="detail-conversation">
+        ${conversationHTML}
+      </div>
+    </div>
+  `;
+}
+
+function resolveSelectedCase() {
+  const c = cases.find(x => x.id === selectedCaseId);
+  if (!c || c.status === "resolved") return;
+
+  c.status = "resolved";
+  c.resolvedAt = new Date().toISOString();
+  c.resolvedBy = "Staff Agent";
+
+  renderStats();
+  renderCasesList();
+  renderCaseDetail();
+  renderAnalytics();
+
+  showToast("success", `Case ${c.id} resolved by staff`);
+}
+
+// Filter buttons
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.dataset.filter;
+    renderCasesList();
+  });
+});
+
+// Analytics rendering
+function renderAnalytics() {
+  // Count issue types
+  const issueCounts = {};
+  cases.forEach(c => {
+    issueCounts[c.intent] = (issueCounts[c.intent] || 0) + 1;
+  });
+
+  const sortedIssues = Object.entries(issueCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const maxCount = sortedIssues[0]?.[1] || 1;
+
+  const barColors = ["var(--accent)", "var(--blue)", "var(--gold)", "var(--orange)", "var(--red)"];
+
+  const barChartHTML = sortedIssues.map(([label, count], i) => `
+    <div class="bar-row">
+      <div class="bar-label">${label}</div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${(count/maxCount)*100}%;background:${barColors[i]};">
+          <span class="bar-value">${count}</span>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  const total = cases.length;
+  const resolved = cases.filter(c => c.status === "resolved").length;
+  const escalated = cases.filter(c => c.status === "escalated").length;
+  const aiResRate = total ? Math.round(resolved / total * 100) : 0;
+  const avgTime = "47s"; // simulated
+
+  document.getElementById("analyticsRow").innerHTML = `
+    <div class="analytics-card">
+      <div class="analytics-card-title"><i class="fas fa-chart-bar"></i> Top 5 Issue Types</div>
+      <div class="bar-chart">${barChartHTML || '<div style="text-align:center;color:var(--text-muted);padding:20px;font-size:13px;">No data yet</div>'}</div>
+    </div>
+    <div class="analytics-card">
+      <div class="analytics-card-title"><i class="fas fa-tachometer-alt"></i> Performance Metrics</div>
+      <div class="metrics-grid">
+        <div class="metric-item">
+          <div class="metric-value" style="color:var(--accent);">${aiResRate}%</div>
+          <div class="metric-label">AI Auto-Resolution Rate</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-value" style="color:var(--green);">${avgTime}</div>
+          <div class="metric-label">Avg. Resolution Time</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-value" style="color:var(--orange);">${total ? Math.round(escalated/total*100) : 0}%</div>
+          <div class="metric-label">Escalation Rate</div>
+        </div>
+        <div class="metric-item">
+          <div class="metric-value" style="color:var(--blue);">${cases.filter(c => c.isPriority).length}</div>
+          <div class="metric-label">Priority Cases Flagged</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+document.querySelectorAll(".nav-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
+    tab.classList.add("active");
+
+    const view = tab.dataset.view;
+    document.getElementById("memberView").classList.toggle("hidden", view !== "member");
+    document.getElementById("staffView").classList.toggle("hidden", view !== "staff");
+
+    if (view === "staff") {
+      renderStats();
+      renderCasesList();
+      renderAnalytics();
+      if (selectedCaseId) renderCaseDetail();
+    }
+  });
+});
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function getTimeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return `${days}d ago`;
+}
+
+function formatTime(dateStr) {
+  return new Date(dateStr).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function showToast(type, message) {
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+
+  const icons = { success: "fa-check-circle", warning: "fa-exclamation-triangle", info: "fa-info-circle" };
+  const colors = { success: "var(--green)", warning: "var(--orange)", info: "var(--accent)" };
+
+  toast.innerHTML = `<i class="fas ${icons[type]}" style="color:${colors[type]};font-size:15px;"></i><span>${message}</span>`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add("hiding");
+    setTimeout(() => toast.remove(), 300);
+  }, 4000);
+}
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+seedInitialCases();
+renderStats();
+renderCasesList();
+renderAnalytics();
+</script>
+</body>
+</html>
